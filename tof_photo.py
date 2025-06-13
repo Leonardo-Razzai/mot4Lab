@@ -12,13 +12,13 @@ import matplotlib.pyplot as plt
 osc = Osc_RS()
 
 tof_vals = np.arange(5, 30, 5) # ms
-tof_vals = [2.0]
+tof_vals = [2.0, 20.0]
 
-img_base_name = 'test'
+img_base_name = 'aom_amp=50'
 
 meas_dict = {'tof [ms]':[], 'S [V]':[]}
 
-inname = 'molasses_and_tof.tmpl' # template file
+inname = 'molasses_and_tof_ramp_aom_amp.tmpl' # template file
 
 try:
 	infile = open(inname, "r")
