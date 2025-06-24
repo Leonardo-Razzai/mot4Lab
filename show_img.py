@@ -3,7 +3,7 @@ from astropy.io import fits
 import matplotlib.pyplot as plt
 import sys
 
-def show_img(img_base_name, tof_val):
+def show_imgs(img_base_name, tof_val):
 
     with fits.open(f"./img/{img_base_name}_tof={tof_val:.1f}ms.fits.gz") as hdul:
         img = hdul[0].data

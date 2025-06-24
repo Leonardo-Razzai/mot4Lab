@@ -16,13 +16,10 @@ shim Z = 0.0 mA                                                 (25)
 ENDINIT
 
 INNER
-+1s	        Trigger CCD = On				(1)
-+1ms		AOM Amp = [700]					(41)
-+1ms	    AOM Amp = [0]					(41)
-+1ms		    Trigger CCD = Off                                   (1)
-+10ms		AOM Amp = [700]					(41)
++1s		RAMP AOM Amp TO [1000]	IN 100s (10 STEPS)				(41)
++101s     AOM Amp = [100]                                         (41)
 ENDINNER
 
-ITERATIONS 10
+ITERATIONS 1
 
 ENDLOOP

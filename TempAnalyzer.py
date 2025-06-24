@@ -37,7 +37,6 @@ KB = 1.38064852e-23 # Boltzmann constant in J/K
 
 # path to image folder
 PATH_TO_IMG = './img'
-title_name = 'Molasses with DDS = 10.5 MHz' # used in plot title
 
 class Image:
     def __init__(self, image):
@@ -53,7 +52,7 @@ class Image:
         self.sigma_x = 0.0
         self.sigma_y = 0.0
     
-    def select_roi(self, x1, x2, y1, y2):
+    def select_roi(self, y1, y2, x1, x2):
         self.im = self.im[y1:y2, x1:x2]
     
     def show_img(self):

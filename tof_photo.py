@@ -14,7 +14,10 @@ osc = Osc_RS()
 tof_vals = np.arange(5, 30, 5) # ms
 tof_vals = [2.0, 20.0]
 
-img_base_name = 'aom_amp=50'
+CAM_GAIN = 1 # dB
+CAM_EXP_TIME = 5000 # us
+
+img_base_name = 'time_ramp_aom=0.6ms'
 
 meas_dict = {'tof [ms]':[], 'S [V]':[]}
 
@@ -55,7 +58,7 @@ def show_imgs():
 			hdul.close()
 
 wait_time_to_meas = 1
-setup_camera(gain=20, exp_time=5000)
+setup_camera(gain=CAM_GAIN, exp_time=CAM_EXP_TIME)
 
 for tof_val in tof_vals:
 	outname = base + '.mot'
