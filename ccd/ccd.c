@@ -144,6 +144,7 @@ int main (int argc, char **argv)
 	  arv_camera_set_exposure_mode(camera,ARV_EXPOSURE_MODE_TIMED,&error);
 	  arv_camera_set_trigger(camera,"Line0",&error);
 	  arv_camera_set_pixel_format_from_string(camera,"Mono16",&error);
+	  arv_camera_set_string(camera, "AdcBitDepth", "Bit12", &error);
 	  arv_camera_set_acquisition_mode (camera,ARV_ACQUISITION_MODE_SINGLE_FRAME,&error);
 	}
       
