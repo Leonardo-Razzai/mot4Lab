@@ -1,0 +1,36 @@
+LOOP
+
+COMMENT
+Acquire Background
+ENDCOMMENT
+
+INIT
+Trigger = Off                                                      (0)
+Trigger CCD = Off						(1) 
+MOT B Field = Off						(14)
+shim X = 0.0 mA                                                 (23)
+shim Y = 0.0 mA                                                 (24)
+shim Z = 0.0 mA                                                 (25)
+
+ENDINIT
+
+INNER
++1s			Ref Cool Freq = 10000000.0 Hz                   (32)
++1ms		MOT B Field = Off				                (14)
++1ms	    AOM Amp = [0]					(41)
++100us		Ref Cool Freq = 10000000.0 Hz                    (32)
++20.0ms	    Trigger CCD = On				(1)
++50us		AOM Amp = [700]					(41)
++300us		AOM Amp = [0]					(41)
++20ms		Trigger CCD = Off                                   (1)
++1ms		AOM Amp = [700]					(41)
++20ms		Ref Cool Freq = 10000000.0 Hz                    (32)
++50us		MOT B Field = Off				                (14)
++50us		shim X = 0.0 mA                                 (23)
++50us		shim Y = 0.0 mA                                 (24)
++50us		shim Z = 0.0 mA                                 (25)
+ENDINNER
+
+ITERATIONS 1
+
+ENDLOOP

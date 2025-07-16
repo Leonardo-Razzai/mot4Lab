@@ -8,6 +8,12 @@ import pandas as pd
 import numpy as np
 from astropy.io import fits
 import matplotlib.pyplot as plt
+import os
+from datetime import date
+
+Date = date.today()
+os.makedirs('raw_data/' + str(Date) + '/img', exist_ok=True)
+os.makedirs('raw_data/' + str(Date) + '/data', exist_ok=True)
 
 osc = Osc_RS()
 
@@ -23,15 +29,18 @@ meas_dict = {'tof [ms]':[], 'S [V]':[]}
 
 inname = 'molasses_and_tof_ramp_aom_amp.tmpl' # template file
 
+mot_folder = './mot_files/'
+tmpl_folder = './tmpl_files/'
+ 
 try:
-	infile = open(inname, "r")
+	infile = open(tmpl_folder + inname, "r")
 except:
 	exit("Cannot open input file")
 
 base, ext = os.path.splitext(os.path.basename(inname))
 
 def write_mot_file(outname, curr_val):
-	outfile = open(outname, "w")
+	outfile = open(mot_folder + outname, "w")
 	for line in infile:
 		out_str = line.replace('<TOF>', f'{curr_val:.1f}')   	
 		outfile.write(out_str)
@@ -40,9 +49,7 @@ def write_mot_file(outname, curr_val):
 
 def send_to_fpga(outname):
 	reset = "python3 -m mot4py -R"
-	command = f"python3 -m mot4py -f {outname}"
-	#subprocess.run(reset, shell=True)
-	#time.sleep(1)
+	command = f"python3 -m mot4py -f {mot_folder + outname}"
 	mot = subprocess.call(command.split())
 
 def setup_camera(gain:float, exp_time: int):
@@ -50,7 +57,7 @@ def setup_camera(gain:float, exp_time: int):
 
 def show_imgs():
 	for tof_val in tof_vals:
-		with fits.open(f"./img/{img_base_name}_tof={tof_val:.1f}ms.fits.gz") as hdul:
+		with fits.open(f"./raw_data/{str(Date)}/img/{img_base_name}_tof={tof_val:.1f}ms.fits.gz") as hdul:
 			img = hdul[0].data
 			plt.imshow(img)
 			plt.title(f'Tof={tof_val:.1f} ms, MaxVal = {np.max(img)}')
@@ -64,8 +71,9 @@ for tof_val in tof_vals:
 	outname = base + '.mot'
 	write_mot_file(outname, tof_val)
 	print(f"<TOF> = {tof_val} ms")
-
-	ccd = subprocess.Popen(f"./ccd/ccd -f ./img/{img_base_name}_tof={tof_val:.1f}ms".split())
+ 
+	fits_fname = f"./raw_data/{str(Date)}/img/{img_base_name}_tof={tof_val:.1f}ms"  
+	ccd = subprocess.Popen(f"./ccd/ccd -f {fits_fname}".split())
 	send_to_fpga(outname)
 	ccd.wait()
 	
