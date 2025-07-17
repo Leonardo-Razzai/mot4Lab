@@ -18,20 +18,20 @@ os.makedirs('raw_data/' + str(Date) + '/data', exist_ok=True)
 tof_vals = np.arange(5, 30, 5) # ms
 tof_vals = [2.0, 20.0]
 
-CAM_GAIN = 1 # dB
+CAM_GAIN = 0 # dB
 CAM_EXP_TIME = 5000 # us
 PROBE_TIME = 300 # us
 
-img_base_name = 'time_ramp_aom=0.6ms'
+img_base_name = 'mol7'
 
 meas_dict = {'tof [ms]':[], 'S [V]':[]}
 
-mot_base_name = 'molasses_and_tof_ramp_aom_amp' # template file name
+mot_base_name = 'molasses_and_tof' # template file name
 
 mot_folder = './mot_files/'
 tmpl_folder = './tmpl_files/'
 
-def write_mot_file(basename, curr_val):
+def write_mot_file(basename, tof_val= None):
 	'''Return the output file name .mot'''
 	try:
 		inname = basename + '.tmpl'
@@ -43,14 +43,16 @@ def write_mot_file(basename, curr_val):
 	outfile = open(mot_folder + outname, "w")
 		
 	for line in infile:
-		out_str = line.replace('<TOF>', f'{curr_val:.1f}')
-		out_str = out_str.replace('<TPR>', f'{PROBE_TIME:.0f}')
-		print(line)
-		print(out_str)
+		out_str = line.replace('<TPR>', f'{PROBE_TIME:.0f}')
+		if tof_val:
+			out_str = out_str.replace('<TOF>', f'{tof_val:.1f}')
 		outfile.write(out_str)
-		
+	
 	outfile.close()
 	infile.close()
+
+	refactor_file(tmpl_folder + inname)
+	refactor_file(mot_folder + outname)
 		
 	return outname
 
@@ -79,6 +81,13 @@ if __name__ == '__main__':
 	wait_time_to_meas = 1
 	setup_camera(gain=CAM_GAIN, exp_time=CAM_EXP_TIME)
 
+	time.sleep(0.5)
+	bkg_mot_fname = write_mot_file('bkg')
+	bkg_fits_fname = f"./raw_data/{str(Date)}/img/bkg_exp={PROBE_TIME}us"  
+	ccd = subprocess.Popen(f"./ccd/ccd -f {bkg_fits_fname}".split())
+	send_to_fpga(bkg_mot_fname)
+	ccd.wait()
+
 	for tof_val in tof_vals:
 		outname = write_mot_file(mot_base_name, tof_val)
 		print(f"<TOF> = {tof_val} ms")
@@ -99,8 +108,8 @@ if __name__ == '__main__':
 
 	print(meas_dict)
 
-	# data_filename = f'data_{img_base_name}.csv'
-	# df = pd.DataFrame(meas_dict)
-	# df.to_csv('./data/' + data_filename)
+	data_filename = f'data_{img_base_name}.csv'
+	df = pd.DataFrame(meas_dict)
+	df.to_csv(f'./raw_data/{str(Date)}/data/' + data_filename)
 
 	show_imgs()
