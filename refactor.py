@@ -14,16 +14,17 @@ def realign(line):
     else:
         return ' '.join(words) + '\n'
 
-def refactor(file):
+def refactor_file(file):
     with open(file, 'r') as f:
         lines = f.readlines()
         f.close()
         
-    with open(fname, 'w') as f:
+    with open(file, 'w') as f:
         for line in lines:
             f.write(realign(line))
-
-import sys
-fname = sys.argv[1]
-
-refactor(fname)
+        f.close()
+        
+if __name__ == '__main__':
+    import sys
+    fname = sys.argv[1]
+    refactor_file(fname)
