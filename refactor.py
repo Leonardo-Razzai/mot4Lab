@@ -7,7 +7,7 @@ def realign(line):
     
     if re.match(r"\+",words[0].strip()):
         time = words[0]
-        return f"{time:<10} {' '.join(words[1:-1]):<60} {words[-1]}\n"
+        return f"{time:<15} {' '.join(words[1:-1]):<60} {words[-1]}\n"
     elif re.match(r"\(\d+\)",words[-1].strip()):
         address=words[-1]
         return f"{' '.join(words[:-1]):<70} {address}\n"
