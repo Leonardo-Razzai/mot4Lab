@@ -158,7 +158,7 @@ class Image:
         G_dB = self.Gain
         G = 10**(G_dB / 20) # convert dB to linear scale
         eta = 0.28 # quantum efficiency of the camera at 780 nm (Datasheet)
-        eADU_0dB = 110.7 # 0.35 at 50 dB, 12 bit
+        eADU_0dB = 78 # 0.35 at 47 dB, 12 bit
         eADU_G = eADU_0dB / G # e/ADU at gain G
         
         R_lens = 1.42 # aperture radius in cm
