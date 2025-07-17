@@ -4,6 +4,7 @@ import numpy as np
 from scipy.optimize import curve_fit
 from astropy.io import fits
 
+SMALL_SIZE = 8
 MEDIUM_SIZE = 14
 BIGGER_SIZE = 15
 
@@ -32,14 +33,21 @@ M_Rb87 = 86.909 * 1.660539e-27 # Rb87 mass in kg
 KB = 1.38064852e-23 # Boltzmann constant in J/K
 
 # path to image folder
-PATH_TO_IMG = './img'
 Gamma = 2 * np.pi * 6.065e6 # Hz
+
+def rescale_image(img_array):
+    '''Rescales the image assuming format 16 bits and bith depth 12 bits.
+    The least significant 4 bits are padding, so they have to be discarded.'''
+    
+    clean_img = img_array & ((1 << 16) - (1 << 4)) # set least significant 4 bits to 0
+    return clean_img // 2**4
 
 class Image:
     def __init__(self, image):
         self.image = image
-        with fits.open(f'{PATH_TO_IMG}/{image}') as hdul:
-            self.im = hdul[0].data
+        with fits.open(image) as hdul:
+            self.im_orig = rescale_image(hdul[0].data)
+            self.im = self.im_orig
             hdr = hdul[0].header
             self.Gain = hdr['GAIN'] # gain in dB
             
@@ -53,16 +61,18 @@ class Image:
         self.sigma_y = 0.0
     
     def select_roi(self, y1, y2, x1, x2):
-        self.im = self.im[y1:y2, x1:x2]
+        self.im = self.im_orig[y1:y2, x1:x2]
         self.row_sum = self.im.sum(axis=0)
         self.col_sum = self.im.sum(axis=1)
         self.tot_counts = self.im.sum()
     
     def show_img(self):
-        plt.imshow(self.im)
-        plt.colorbar()
+        fig, ax = plt.subplots(1)
+        ax.imshow(self.im)
+        legend = f"MaxCounts = {self.im.max():.0f}\n" + f"Gain = {self.Gain:.0f} dB"
+        ax.text(10, 40, legend, bbox={'facecolor': 'white'}, fontdict={'fontsize': SMALL_SIZE})
         plt.show()
-    
+            
     def plot_axis(self, axis='x'):
         self.row_sum = self.im.sum(axis=0)
         self.col_sum = self.im.sum(axis=1)
@@ -109,17 +119,21 @@ class Image:
                 self.sigma_x = abs(popt[2])
                 self.int_x = popt[0] * np.sqrt(2 * np.pi) * self.sigma_x
                 self.cx = popt[3] * len(xdata) # baseline counts
+                Na, dNa = self.Get_Number_Of_Atoms('x')
                 
             elif axis == 'y':
                 self.mu_y = popt[1]
                 self.sigma_y = abs(popt[2])
                 self.int_y = popt[0] * np.sqrt(2 * np.pi) * self.sigma_y
                 self.cy = popt[3] * len(xdata) # baseline counts
+                Na, dNa = self.Get_Number_Of_Atoms('y')
                          
             if plot:
                 plt.plot(xdata, ydata)
-                plt.plot(xdata, gaussian(xdata, *popt), '--', color='red', label='Gaussian: ' + f'sigma={popt[2]:.0f}')
-                plt.legend()
+                label = 'Gaussian Fit: ' + f'\nA = {popt[0]:.0f}\n' + r'$\mu$ ='+f'{popt[1]:.0f}\n' r'$\sigma$ ='+f'{popt[2]:.0f}\n\n'
+                num_label = r'$N_{atoms}$ = ' + f'({Na /1e8:.1f}' + r'$\pm$' + f'{dNa /1e8:.1f})' + r'x$10^8$'
+                plt.plot(xdata, gaussian(xdata, *popt), '--', color='red', label=label+num_label)
+                plt.legend(fontsize = SMALL_SIZE)
                 plt.title(f'Gaussian Fit along {axis} axis')
                 plt.xlabel(f'{axis} (pixels)')
                 plt.ylabel('Intensity')
@@ -146,8 +160,6 @@ class Image:
         eta = 0.28 # quantum efficiency of the camera at 780 nm (Datasheet)
         eADU_0dB = 110.7 # 0.35 at 50 dB, 12 bit
         eADU_G = eADU_0dB / G # e/ADU at gain G
-        bit_depth = 12
-        bit_format = 16
         
         R_lens = 1.42 # aperture radius in cm
         dist_mot = 18 # cm
@@ -157,7 +169,7 @@ class Image:
         Delta = 2.2 * Gamma
         N_ph_per_atom = SC_Rate(Delta) * t_pulse
         N_el_per_atom = N_ph_per_atom * fractional_sigma * eta
-        N_counts_per_atom = N_el_per_atom / eADU_G * 2**(bit_format - bit_depth)
+        N_counts_per_atom = N_el_per_atom / eADU_G
         
         if axis == 'x':
             N_counts_MOT = self.int_x
