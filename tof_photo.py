@@ -18,11 +18,11 @@ os.makedirs('raw_data/' + str(Date) + '/data', exist_ok=True)
 tof_vals = np.arange(5, 30, 5) # ms
 tof_vals = [2.0, 20.0]
 
-CAM_GAIN = 0 # dB
+CAM_GAIN = 5 # dB
 CAM_EXP_TIME = 5000 # us
 PROBE_TIME = 300 # us
 
-img_base_name = 'mol7'
+img_base_name = 'mol_G=5'
 
 meas_dict = {'tof [ms]':[], 'S [V]':[]}
 
@@ -74,7 +74,7 @@ def show_imgs():
 			hdul.close()
    
 def append_t_probe_fits(fname):
-    with fits.open(fname) as hdul:
+    with fits.open(fname+'.fits.gz') as hdul:
         hdr = hdul[0].header
         hdr['T_PROBE'] = (PROBE_TIME, 'Probe time in us')
         hdul.close()
