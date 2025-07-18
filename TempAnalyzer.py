@@ -50,6 +50,7 @@ class Image:
             self.im = self.im_orig
             hdr = hdul[0].header
             self.Gain = hdr['GAIN'] # gain in dB
+            self.T_probe = hdr['T_PROBE'] # t_probe us for 
             
         self.row_sum = self.im.sum(axis=0)
         self.col_sum = self.im.sum(axis=1)
@@ -174,7 +175,7 @@ class Image:
         R_lens = 1.42 # aperture radius in cm
         dist_mot = 18 # cm
         fractional_sigma = 0.25 * (R_lens/dist_mot)**2
-        t_pulse = 300e-6 # s        
+        t_pulse = self.T_probe * 1e-6 # s        
 
         Delta = 2.2 * Gamma
         N_ph_per_atom = SC_Rate(Delta) * t_pulse
