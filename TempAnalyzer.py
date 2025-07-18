@@ -215,6 +215,19 @@ def Get_temperature(im1: Image, im2: Image, t1: float, t2: float):
     
     return T, dT
 
+def Sat_param():
+    
+    P_MOT = 70 # mW, MOT beams power
+    
+    NA = 0.16
+    f = 7.5 # cm
+    w0 = NA * f
+    P_cool_beam = 0.25 * P_MOT/3
+    I_cool_beam = 2*P_cool_beam / (np.pi * w0**2)
+    I_cool = 6 * I_cool_beam
+    I_sat = 1.67 # mW/cm^2
+    return I_cool / I_sat
+
 def SC_Rate(Delta):
-    s0 = 34 # saturation parameter P = 65 mW
+    s0 = Sat_param()# saturation parameter
     return Gamma / 2 * s0 / (1 + s0 + 4 * (Delta / Gamma)**2)  
