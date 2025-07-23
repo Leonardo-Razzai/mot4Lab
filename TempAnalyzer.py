@@ -80,8 +80,11 @@ class Image:
     def show_img(self):
         fig, ax = plt.subplots(1)
         ax.imshow(self.im)
-        legend = f"MaxCounts = {self.im.max():.0f}\n" + f"Gain = {self.Gain:.0f} dB"
-        ax.text(10, 40, legend, bbox={'facecolor': 'white'}, fontdict={'fontsize': SMALL_SIZE})
+        legend = f"MaxCounts = {self.im.max():.0f}\n"
+        legend += f"Gain = {self.Gain:.0f} dB\n"
+        legend += f"T_probe = {self.t_probe} us"
+            
+        ax.text(10, 520, legend, bbox={'facecolor': 'white'}, fontdict={'fontsize': SMALL_SIZE})
         plt.show()
             
     def plot_axis(self, axis='x'):
