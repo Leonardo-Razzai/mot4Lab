@@ -164,7 +164,7 @@ int main (int argc, char **argv)
 	      buffer=arv_camera_acquisition(camera,0,&error);
 	      if(ARV_IS_BUFFER(buffer))
 		{
-		  fits_create_img(fptr,SHORT_IMG,2,naxes,&status);		  
+		  fits_create_img(fptr,USHORT_IMG,2,naxes,&status);		  
 		  fits_write_key(fptr,TDOUBLE,"GAIN",&gv,"G in dB",&status);
 		  fits_write_key(fptr,TDOUBLE,"EXPOSURE",&ev,"Exp. time in us",&status);	      
 #if ARAVIS_CHECK_VERSION(0,8,26)
