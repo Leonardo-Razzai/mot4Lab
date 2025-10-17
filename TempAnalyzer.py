@@ -82,7 +82,7 @@ class Image:
         ax.imshow(self.im)
         legend = f"MaxCounts = {self.im.max():.0f}\n"
         legend += f"Gain = {self.Gain:.0f} dB\n"
-        legend += f"T_probe = {self.t_probe} us"
+        legend += f"T_probe = {self.T_probe} us"
             
         ax.text(10, 520, legend, bbox={'facecolor': 'white'}, fontdict={'fontsize': SMALL_SIZE})
         plt.show()
@@ -221,7 +221,7 @@ def Get_temperature(im1: Image, im2: Image, t1: float, t2: float):
 
 def Sat_param():
     
-    P_MOT = 70 # mW, MOT beams power
+    P_MOT = 78 # mW, MOT beams power
     
     NA = 0.16
     f = 7.5 # cm
