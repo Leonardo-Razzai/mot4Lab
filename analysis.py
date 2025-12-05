@@ -1,5 +1,10 @@
 from TempAnalyzer import *
-import matplotlib.pyplot as plt  
+import matplotlib.pyplot as plt
+
+'''
+This script is intended to be used to analyze a dataset of images,
+where for each image a parameter is changed (e.g. detuning)
+'''
 
 def Analysis_Num_and_T(dataset, t1, t2):
     
