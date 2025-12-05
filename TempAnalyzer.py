@@ -193,6 +193,8 @@ class Image:
             raise ValueError("Invalid axis")
         
         N_atoms = N_counts_MOT / N_counts_per_atom
+        print(f'\n --- Image {self.image} ---  ')
+        print('Results from fit:')
         print(f'Number of Atoms = {N_atoms:.2e}')
         print(f'Integral of Gaussian = {N_counts_MOT:.2e}, N_tot by diff. = {self.tot_counts - self.cx:.2e}')
         
