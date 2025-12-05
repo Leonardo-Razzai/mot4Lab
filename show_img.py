@@ -3,8 +3,15 @@ from astropy.io import fits
 import matplotlib.pyplot as plt
 import sys
 
-def show_imgs(img_base_name, tof_val):
+def show_img(file_name):
+    with fits.open(f"./img/{file_name}.fits.gz") as hdul:
+        img = hdul[0].data
+        plt.imshow(img)
+        plt.title(f'Tot counts={np.sum(img):.2e}, MaxVal = {np.max(img):.2e}')
+        plt.show()
+        hdul.close()
 
+def show_imgs_tof(img_base_name, tof_val):
     with fits.open(f"./img/{img_base_name}_tof={tof_val:.1f}ms.fits.gz") as hdul:
         img = hdul[0].data
         plt.imshow(img)
@@ -12,7 +19,6 @@ def show_imgs(img_base_name, tof_val):
         plt.show()
         hdul.close()
 
-img_base_name = sys.argv[1]
-tof_val = float(sys.argv[2])
+file_name = sys.argv[1]
 
-show_img(img_base_name, tof_val)
+show_img(file_name)

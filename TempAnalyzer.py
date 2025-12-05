@@ -246,7 +246,7 @@ def Get_temperature(im1: Image, im2: Image, t1: float, t2: float, axis='x'):
 
 def Sat_param():
     
-    P_MOT = 70 # mW, MOT beams power
+    P_MOT = 78 # mW, MOT beams power
     
     NA = 0.16
     f = 7.5 # cm
