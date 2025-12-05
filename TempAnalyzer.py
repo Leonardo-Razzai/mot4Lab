@@ -29,29 +29,33 @@ M_pix = 53 # pix/mm calibration 2 with mot (23-06-2025)
 err_rel_M = 1/M_pix
 PIXEL_SIZE = 1/M_pix
 
+CCD_counts_per_photon = 0.58 # counts per photon calib 24-07-2025
+err_rel_counts_per_photon = 0.02
+
 M_Rb87 = 86.909 * 1.660539e-27 # Rb87 mass in kg
 KB = 1.38064852e-23 # Boltzmann constant in J/K
 
 # path to image folder
 Gamma = 2 * np.pi * 6.065e6 # Hz
 
-def rescale_image(img_array):
+def clean_image(img_array):
     '''Rescales the image assuming format 16 bits and bith depth 12 bits.
     The least significant 4 bits are padding, so they have to be discarded.'''
     
     clean_img = img_array & ((1 << 16) - (1 << 4)) # set least significant 4 bits to 0
-    return clean_img // 2**4
+    return clean_img
 
 class Image:
     def __init__(self, image):
         self.image = image
         with fits.open(image) as hdul:
-            self.im_orig = rescale_image(hdul[0].data)
+            self.im_orig = clean_image(hdul[0].data)
+            print(f'{self.image}: Min = {self.im_orig.min()}, Max = {self.im_orig.max()}')
             self.im = self.im_orig
             hdr = hdul[0].header
             self.Gain = hdr['GAIN'] # gain in dB
-            self.T_probe = hdr['T_PROBE'] # t_probe us for 
-            
+        
+        
         self.row_sum = self.im.sum(axis=0)
         self.col_sum = self.im.sum(axis=1)
         self.tot_counts = self.im.sum()
@@ -80,11 +84,8 @@ class Image:
     def show_img(self):
         fig, ax = plt.subplots(1)
         ax.imshow(self.im)
-        legend = f"MaxCounts = {self.im.max():.0f}\n"
-        legend += f"Gain = {self.Gain:.0f} dB\n"
-        legend += f"T_probe = {self.t_probe} us"
-            
-        ax.text(10, 520, legend, bbox={'facecolor': 'white'}, fontdict={'fontsize': SMALL_SIZE})
+        legend = f"MaxCounts = {self.im.max():.0f}\n" + f"Gain = {self.Gain:.0f} dB"
+        ax.text(10, 40, legend, bbox={'facecolor': 'white'}, fontdict={'fontsize': SMALL_SIZE})
         plt.show()
             
     def plot_axis(self, axis='x'):
@@ -171,19 +172,15 @@ class Image:
         
         G_dB = self.Gain
         G = 10**(G_dB / 20) # convert dB to linear scale
-        eta = 0.28 # quantum efficiency of the camera at 780 nm (Datasheet)
-        eADU_0dB = 78 # 0.35 at 47 dB, 12 bit
-        eADU_G = eADU_0dB / G # e/ADU at gain G
         
         R_lens = 1.42 # aperture radius in cm
-        dist_mot = 18 # cm
+        dist_mot = 20 # cm
         fractional_sigma = 0.25 * (R_lens/dist_mot)**2
-        t_pulse = self.T_probe * 1e-6 # s        
+        t_pulse = 300e-6 # s
 
         Delta = 2.2 * Gamma
         N_ph_per_atom = SC_Rate(Delta) * t_pulse
-        N_el_per_atom = N_ph_per_atom * fractional_sigma * eta
-        N_counts_per_atom = N_el_per_atom / eADU_G
+        N_counts_per_atom = N_ph_per_atom * fractional_sigma * G * CCD_counts_per_photon
         
         if axis == 'x':
             N_counts_MOT = self.int_x
@@ -193,21 +190,49 @@ class Image:
             raise ValueError("Invalid axis")
         
         N_atoms = N_counts_MOT / N_counts_per_atom
-        print(f'Number of Atoms = {N_atoms:.2e}')
-        print(f'Integral of Gaussian = {N_counts_MOT:.2e}, N_tot by diff. = {self.tot_counts - self.cx:.2e}')
+        #print(f'Number of Atoms = {N_atoms:.2e}')
+        #print(f'Integral of Gaussian = {N_counts_MOT:.2e}, N_tot by diff. = {self.tot_counts - self.cx:.2e}')
         
-        return N_atoms, 0.1*N_atoms
+        err_rel_dist = 1 / dist_mot
+        err_rel_sigma = 2 * err_rel_dist
+        
+        err_rel_N = err_rel_sigma + err_rel_counts_per_photon
+        dN_atoms = N_atoms * err_rel_N
+        
+        return N_atoms, dN_atoms
     
-
+    def Get_Number_Of_Atoms_avg(self):
+        Nx, dNx = self.Get_Number_Of_Atoms('x')
+        Ny, dNy = self.Get_Number_Of_Atoms('y')
+        weights = np.array([1/dNx**2, 1/dNy**2])
+        N_atoms = np.average([Nx, Ny], weights=weights)
+        dN_atoms = np.sqrt(1 / np.sum(weights))
+        return N_atoms, dN_atoms
+    
 def gaussian(x, A, mu, sigma, C):
     return A * np.exp(-0.5 * ((x - mu) / sigma)**2) + C
 
-def Get_temperature(im1: Image, im2: Image, t1: float, t2: float):
+def Get_temperature_avg(im1: Image, im2: Image, t1: float, t2: float):
+    Tx, dTx = Get_temperature(im1, im2, t1, t2, axis='x')
+    Ty, dTy = Get_temperature(im1, im2, t1, t2, axis='y')
+    weights = np.array([1/dTx**2, 1/dTy**2])
+    T = np.average([Tx, Ty], weights=weights)
+    dT = np.sqrt(1 / np.sum(weights))
+    return T, dT
+    
+def Get_temperature(im1: Image, im2: Image, t1: float, t2: float, axis='x'):
     """
     Calculate the temperature from the variance along x and time of flight.
     """
-    var1 = im1.sigma_x**2 * PIXEL_SIZE**2
-    var2 = im2.sigma_x**2 * PIXEL_SIZE**2
+    if axis == 'x':
+        sigma1 = im1.sigma_x
+        sigma2 = im2.sigma_x
+    elif axis == 'y':
+        sigma1 = im1.sigma_y
+        sigma2 = im2.sigma_y
+        
+    var1 = sigma1**2 * PIXEL_SIZE**2
+    var2 = sigma2**2 * PIXEL_SIZE**2
     dvar1 = 2 * err_rel_M * var1
     dvar2 = 2 * err_rel_M * var2
     
