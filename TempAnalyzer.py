@@ -52,8 +52,8 @@ class Image:
             self.im_orig = clean_image(hdul[0].data)
             print(f'{self.image}: Min = {self.im_orig.min()}, Max = {self.im_orig.max()}')
             self.im = self.im_orig
-            hdr = hdul[0].header
-            self.Gain = hdr['GAIN'] # gain in dB
+            self.hdr = hdul[0].header
+            self.Gain = self.hdr['GAIN'] # gain in dB
         
         
         self.row_sum = self.im.sum(axis=0)
@@ -176,7 +176,7 @@ class Image:
         R_lens = 1.42 # aperture radius in cm
         dist_mot = 20 # cm
         fractional_sigma = 0.25 * (R_lens/dist_mot)**2
-        t_pulse = 300e-6 # s
+        t_pulse = self.hdr['T_PROBE'] * 1e-6 # s
 
         Delta = 2.2 * Gamma
         N_ph_per_atom = SC_Rate(Delta) * t_pulse
@@ -208,6 +208,9 @@ class Image:
         N_atoms = np.average([Nx, Ny], weights=weights)
         dN_atoms = np.sqrt(1 / np.sum(weights))
         return N_atoms, dN_atoms
+    
+    def GetCM(self):
+        return (self.mu_x, self.mu_y)
     
 def gaussian(x, A, mu, sigma, C):
     return A * np.exp(-0.5 * ((x - mu) / sigma)**2) + C
