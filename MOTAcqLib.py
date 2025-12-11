@@ -5,6 +5,7 @@ import subprocess
 from astropy.io import fits
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 Date = date.today()
 os.makedirs('raw_data/' + str(Date) + '/img', exist_ok=True)
@@ -14,7 +15,7 @@ mot_folder = './mot_files/'
 tmpl_folder = './tmpl_files/'
 img_folder = f'./raw_data/{str(Date)}/img/'
 
-def write_mot_file(basename, t_probe = None, tof_val= None):
+def write_mot_file(basename, t_probe = None, tof_val= None, shim_z = None):
     '''Return the output file name .mot'''
     try:
         inname = basename + '.tmpl'
@@ -31,6 +32,13 @@ def write_mot_file(basename, t_probe = None, tof_val= None):
             out_str = out_str.replace('<TPR>', f'{t_probe:.0f}')
         if tof_val:
             out_str = out_str.replace('<TOF>', f'{tof_val:.0f}')
+        if shim_z:
+            if np.abs(shim_z) < 2000:
+                out_str = out_str.replace('<SHIM_Z>', f'{shim_z:.1f}')
+            else:
+                print('The chosen current value is too high. iT is ounded to (-2000, 2000) mA')
+                exit()
+
         outfile.write(out_str)
         
     outfile.close()
@@ -79,7 +87,8 @@ def acquire_img(mot_fname, fits_fname, t_probe=None):
     send_to_fpga(mot_fname)
     ccd.wait()
     
-    append_t_probe_fits(img_folder + fits_fname, t_probe)
+    if t_probe:
+        append_t_probe_fits(img_folder + fits_fname, t_probe)
         
 def write_and_acquire_bkg(t_probe):
         
@@ -92,12 +101,14 @@ def write_and_acquire_bkg(t_probe):
 
     acquire_img(bkg_mot_fname, bkg_fits_fname, t_probe=t_probe)
 
-def write_and_acquire_mot(mot_base_name: str, fits_fname: str, t_probe = None, tof_val = None):
+def write_and_acquire_mot(mot_base_name: str, fits_fname: str, t_probe = None, tof_val = None, shim_z = None):
         
-    mot_fname = write_mot_file(mot_base_name, t_probe, tof_val)
+    mot_fname = write_mot_file(mot_base_name, t_probe, tof_val, shim_z)
     
     if tof_val:
         fits_fname += f"_tof={tof_val:.1f}ms"
+    if shim_z:
+        fits_fname += f"_Iz={shim_z:.1f}mA"
         
     acquire_img(mot_fname, fits_fname, t_probe=t_probe)
         
