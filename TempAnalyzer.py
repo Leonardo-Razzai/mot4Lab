@@ -142,10 +142,15 @@ class Image:
                 self.int_y = popt[0] * np.sqrt(2 * np.pi) * self.sigma_y
                 self.cy = popt[3] * len(xdata) # baseline counts
                 Na, dNa = self.Get_Number_Of_Atoms('y')
-                         
+
+            label = '\nResults from 1 Gaussian Fit: ' + f'\nA = {popt[0]:.0f}\n' + 'mu ='+f'{popt[1]:.0f}\n' 'sigma ='+f'{popt[2]:.0f}'
+            num_label = f'N = ({Na /1e8:.1f} +- {dNa /1e8:.1f}) x 10^8'
+            print(label)
+            print(num_label+'\n')
+
             if plot:
                 plt.plot(xdata, ydata)
-                label = 'Gaussian Fit: ' + f'\nA = {popt[0]:.0f}\n' + r'$\mu$ ='+f'{popt[1]:.0f}\n' r'$\sigma$ ='+f'{popt[2]:.0f}\n\n'
+                label = 'Gaussian Fit: ' + f'\nA = {popt[0]:.0f}\n' + r'$\mu$ ='+f'{popt[1]:.0f}\n' r'$\sigma$ ='+f'{popt[2]:.0f}\n'
                 num_label = r'$N_{atoms}$ = ' + f'({Na /1e8:.1f}' + r'$\pm$' + f'{dNa /1e8:.1f})' + r'x$10^8$'
                 plt.plot(xdata, gaussian(xdata, *popt), '--', color='red', label=label+num_label)
                 plt.legend(fontsize = SMALL_SIZE)
