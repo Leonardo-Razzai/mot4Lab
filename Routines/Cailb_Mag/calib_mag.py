@@ -2,8 +2,8 @@ import time
 import numpy as np
 from astropy.io import fits
 import matplotlib.pyplot as plt
-from MOTAcqLib import *
-from Analysis.TempAnalyzer import *
+from Modules.MOTAcqLib import *
+from Modules.TempAnalyzer import *
 
 Iz_vals = [-1000., -500., -200., 0., 200., 500., 1000.] # in mA
 
@@ -19,7 +19,7 @@ Grad_mot = b_mot * I_mot # G/mm
 # Compensation coils
 a_comp = 1.4 # (G/A)
 
-data_folder = f'./raw_data/{str(Date)}/img/'
+data_folder = f'../../raw_data/{str(Date)}/img/'
 img_base_name = 'Calib_Mag'
 
 def f_base_name(Bz):
