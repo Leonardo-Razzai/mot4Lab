@@ -1,7 +1,7 @@
 from astropy.io import fits
 import matplotlib.pyplot as plt
 from MOTAcqLib import *
-from TempAnalyzer import *
+from Analysis.TempAnalyzer import *
 
 CAM_GAIN = 0 # dB
 CAM_EXP_TIME = 1000 # us

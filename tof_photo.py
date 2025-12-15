@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
 	print('Sequence completed')
 
-	from TempAnalyzer import *
+	from Analysis.TempAnalyzer import *
 
 	print('\n\n------------------------------------------------------')
 	print('IMAGE PROCESSING:')

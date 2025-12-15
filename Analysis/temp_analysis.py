@@ -1,4 +1,4 @@
-from TempAnalyzer import *
+from Analysis.TempAnalyzer import *
 
 date = '2025-12-05'
 data_folder = 'raw_data/'+ f'{date}/img/'

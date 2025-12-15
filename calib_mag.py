@@ -3,7 +3,7 @@ import numpy as np
 from astropy.io import fits
 import matplotlib.pyplot as plt
 from MOTAcqLib import *
-from TempAnalyzer import *
+from Analysis.TempAnalyzer import *
 
 Iz_vals = [-1000., -500., -200., 0., 200., 500., 1000.] # in mA
 
