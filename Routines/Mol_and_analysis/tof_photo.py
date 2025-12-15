@@ -14,13 +14,13 @@ data_folder = f'../../raw_data/{str(Date)}/img/'
 img_base_name = 'molasses'
 
 def f_base_name(t):
-    return f'{img_base_name}_tof={t:.1f}ms.fits.gz'
+    return f'{img_base_name}_tof={t:.1f}ms'
 
 mot_base_name = 'molasses_and_tof' # template file name
 
 def show_imgs():
 	for tof_val in tof_vals:
-		with fits.open(f"{data_folder}{img_base_name}_tof={tof_val:.1f}ms.fits.gz") as hdul:
+		with fits.open(f"{data_folder}{f_base_name(tof_val)}.fits.gz") as hdul:
 			img = hdul[0].data
 			plt.imshow(img)
 			plt.title(f'Tof={tof_val:.1f} ms, MaxVal = {np.max(img)}')
@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
 	for tof_val in tof_vals:
      
-		write_and_acquire_mot(mot_base_name, img_base_name, t_probe=PROBE_TIME, tof_val=tof_val)
+		write_and_acquire_mot(mot_base_name, f_base_name(tof_val), t_probe=PROBE_TIME, tof_val=tof_val)
 
 	print('Sequence completed')
 
@@ -50,8 +50,8 @@ if __name__ == '__main__':
 
 	print('\n\n------------------------------------------------------')
 	print('IMAGE PROCESSING:')
-	img1 = Image(data_folder + f_base_name(tof_vals[0]))
-	img2 = Image(data_folder + f_base_name(tof_vals[-1]))
+	img1 = Image(data_folder + f_base_name(tof_vals[0]) + '.fits.gz')
+	img2 = Image(data_folder + f_base_name(tof_vals[-1]) + '.fits.gz')
 	print('')
 
 	img1.select_roi(0, 300, 200, 500)
