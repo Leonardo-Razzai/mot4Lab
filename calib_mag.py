@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from MOTAcqLib import *
 from TempAnalyzer import *
 
-Iz_vals = [-1000, 500, 0, 500, 1000] # in mA
+Iz_vals = [-1000., -500., -200., 0., 200., 500., 1000.] # in mA
 
 CAM_GAIN = 5 # dB
 CAM_EXP_TIME = 5000 # us
@@ -44,7 +44,7 @@ def Get_MagFactor(plot=False):
 		
 	muz_arr = np.array(muz_vals) # in pixels
 	muy_arr = np.array(muy_vals)
-	Iz_arr = np.array(Iz_vals) * 1e3 # in A
+	Iz_arr = np.array(Iz_vals)*1e-3 # in A
 	
 	z_MOT_vals = Iz_arr * a_comp / Grad_mot
 
@@ -61,7 +61,7 @@ def Get_MagFactor(plot=False):
 	if plot:
 		z_fit = np.linspace(z_MOT_vals.min(), z_MOT_vals.max(), 5)
 		plt.plot(z_MOT_vals, muz_arr, 'o', label='Data')
-		plt.plot(z_fit, c + m*z_fit, '--', label=r'Linear Fit ($m \cdot z + c$) :' + f'\nm = {m:.2f} pix/mm\n' + f'\nM = ({M_fit:.0f}' + r'$\pm$' + f' {dM:.0f}) pix/mm')
+		plt.plot(z_fit, c + m*z_fit, '--', label=r'Linear Fit ($m \cdot z + c$) :' + f'\nm = {m:.2f} pix/mm\n' + f'\nM = ({M_fit:.2f}' + r'$\pm$' + f' {dM:.2f}) pix/mm')
 		plt.xlabel('z_MOT (mm)')
 		plt.ylabel('Displacement (pixels)')
 		plt.title('Displacemenet along z: z CCD vs z MOT')
@@ -79,9 +79,12 @@ if __name__ == '__main__':
 
 	time.sleep(0.5)
 	for Iz_val in Iz_vals:
-		write_and_acquire_mot(mot_base_name, img_base_name, Iz_val=Iz_val)
+		write_and_acquire_mot(mot_base_name, img_base_name, shim_z=Iz_val)
+		print(f_base_name(Iz_val))
+		# write_mot_file(mot_base_name, shim_z=Iz_val)
+		time.sleep(1)
 
 	time.sleep(0.5)
 	M, dM = Get_MagFactor(plot=True)
 
-	print(f'\Magnification : ({M:.3f} +- {dM:.3f}) pix/mm \n\n')
+	print(f'Magnification : ({M:.3f} +- {dM:.3f}) pix/mm \n\n')
