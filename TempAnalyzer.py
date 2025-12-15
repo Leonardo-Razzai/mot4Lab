@@ -129,30 +129,40 @@ class Image:
             popt, pcov = curve_fit(gaussian, xdata, ydata, 
                         p0 = [np.max(ydata) - np.min(ydata), np.argmax(ydata), np.max(xdata) / 10, np.min(ydata)], maxfev=100000)
             
+            Na =  None
+            dNa = None
             if axis == 'x':
                 self.mu_x = popt[1]
                 self.sigma_x = abs(popt[2])
                 self.int_x = popt[0] * np.sqrt(2 * np.pi) * self.sigma_x
                 self.cx = popt[3] * len(xdata) # baseline counts
-                Na, dNa = self.Get_Number_Of_Atoms('x')
-                
+                Res_N = self.Get_Number_Of_Atoms('x')
+                if Res_N != None:
+                    Na, dNa = Res_N
+
             elif axis == 'y':
                 self.mu_y = popt[1]
                 self.sigma_y = abs(popt[2])
                 self.int_y = popt[0] * np.sqrt(2 * np.pi) * self.sigma_y
                 self.cy = popt[3] * len(xdata) # baseline counts
-                Na, dNa = self.Get_Number_Of_Atoms('y')
+                Res_N = self.Get_Number_Of_Atoms('y')
+                if Res_N != None:
+                    Na, dNa = Res_N
 
             label = '\nResults from 1 Gaussian Fit: ' + f'\nA = {popt[0]:.0f}\n' + 'mu ='+f'{popt[1]:.0f}\n' 'sigma ='+f'{popt[2]:.0f}'
-            num_label = f'N = ({Na /1e8:.1f} +- {dNa /1e8:.1f}) x 10^8'
             print(label)
-            print(num_label+'\n')
+            if Na != None:
+                num_label = f'N = ({Na /1e8:.1f} +- {dNa /1e8:.1f}) x 10^8'
+                print(num_label+'\n')
 
             if plot:
                 plt.plot(xdata, ydata)
                 label = 'Gaussian Fit: ' + f'\nA = {popt[0]:.0f}\n' + r'$\mu$ ='+f'{popt[1]:.0f}\n' r'$\sigma$ ='+f'{popt[2]:.0f}\n'
-                num_label = r'$N_{atoms}$ = ' + f'({Na /1e8:.1f}' + r'$\pm$' + f'{dNa /1e8:.1f})' + r'x$10^8$'
-                plt.plot(xdata, gaussian(xdata, *popt), '--', color='red', label=label+num_label)
+                if Na != None:
+                    num_label = r'$N_{atoms}$ = ' + f'({Na /1e8:.1f}' + r'$\pm$' + f'{dNa /1e8:.1f})' + r'x$10^8$'
+                    label += num_label
+
+                plt.plot(xdata, gaussian(xdata, *popt), '--', color='red', label=label)
                 plt.legend(fontsize = SMALL_SIZE)
                 plt.title(f'Gaussian Fit along {axis} axis')
                 plt.xlabel(f'{axis} (pixels)')
@@ -181,30 +191,39 @@ class Image:
         R_lens = 1.42 # aperture radius in cm
         dist_mot = 20 # cm
         fractional_sigma = 0.25 * (R_lens/dist_mot)**2
-        t_pulse = self.hdr['T_PROBE'] * 1e-6 # s
+        t_pulse = None
 
-        Delta = 2.2 * Gamma
-        N_ph_per_atom = SC_Rate(Delta) * t_pulse
-        N_counts_per_atom = N_ph_per_atom * fractional_sigma * G * CCD_counts_per_photon
+        try:
+            t_pulse = self.hdr['T_PROBE'] * 1e-6 # s
+        except KeyError as e:
+            print('No t_probe found. Continuing...')
+            pass
         
-        if axis == 'x':
-            N_counts_MOT = self.int_x
-        elif axis == 'y':
-            N_counts_MOT = self.int_y
+        if t_pulse != None:
+            Delta = 2.2 * Gamma
+            N_ph_per_atom = SC_Rate(Delta) * t_pulse
+            N_counts_per_atom = N_ph_per_atom * fractional_sigma * G * CCD_counts_per_photon
+        
+            if axis == 'x':
+                N_counts_MOT = self.int_x
+            elif axis == 'y':
+                N_counts_MOT = self.int_y
+            else:
+                raise ValueError("Invalid axis")
+            
+            N_atoms = N_counts_MOT / N_counts_per_atom
+            #print(f'Number of Atoms = {N_atoms:.2e}')
+            #print(f'Integral of Gaussian = {N_counts_MOT:.2e}, N_tot by diff. = {self.tot_counts - self.cx:.2e}')
+            
+            err_rel_dist = 1 / dist_mot
+            err_rel_sigma = 2 * err_rel_dist
+            
+            err_rel_N = err_rel_sigma + err_rel_counts_per_photon
+            dN_atoms = N_atoms * err_rel_N
+            
+            return N_atoms, dN_atoms
         else:
-            raise ValueError("Invalid axis")
-        
-        N_atoms = N_counts_MOT / N_counts_per_atom
-        #print(f'Number of Atoms = {N_atoms:.2e}')
-        #print(f'Integral of Gaussian = {N_counts_MOT:.2e}, N_tot by diff. = {self.tot_counts - self.cx:.2e}')
-        
-        err_rel_dist = 1 / dist_mot
-        err_rel_sigma = 2 * err_rel_dist
-        
-        err_rel_N = err_rel_sigma + err_rel_counts_per_photon
-        dN_atoms = N_atoms * err_rel_N
-        
-        return N_atoms, dN_atoms
+            return None
     
     def Get_Number_Of_Atoms_avg(self):
         Nx, dNx = self.Get_Number_Of_Atoms('x')
