@@ -11,7 +11,7 @@ CAM_EXP_TIME = 5000 # us
 PROBE_TIME = 300 # us
 
 data_folder = f'./raw_data/{str(Date)}/img/'
-img_base_name = 'T_meas_test'
+img_base_name = 'molasses'
 
 def f_base_name(t):
     return f'{img_base_name}_tof={t:.1f}ms.fits.gz'
