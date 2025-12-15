@@ -32,12 +32,8 @@ def write_mot_file(basename, t_probe = None, tof_val= None, shim_z = None):
             out_str = out_str.replace('<TPR>', f'{t_probe:.0f}')
         if tof_val:
             out_str = out_str.replace('<TOF>', f'{tof_val:.0f}')
-        if shim_z:
-            if np.abs(shim_z) < 2000:
-                out_str = out_str.replace('<SHIM_Z>', f'{shim_z:.1f}')
-            else:
-                print('The chosen current value is too high. iT is ounded to (-2000, 2000) mA')
-                exit()
+        if shim_z != None:
+            out_str = out_str.replace('<SHIM_Z>', f'{shim_z:.1f}')
 
         outfile.write(out_str)
         
@@ -45,7 +41,7 @@ def write_mot_file(basename, t_probe = None, tof_val= None, shim_z = None):
     infile.close()
 
     refactor_file(tmpl_folder + inname)
-    refactor_file(mot_folder + outname)
+    # refactor_file(mot_folder + outname)
         
     return outname
 
@@ -105,9 +101,9 @@ def write_and_acquire_mot(mot_base_name: str, fits_fname: str, t_probe = None, t
         
     mot_fname = write_mot_file(mot_base_name, t_probe, tof_val, shim_z)
     
-    if tof_val:
+    if tof_val  != None:
         fits_fname += f"_tof={tof_val:.1f}ms"
-    if shim_z:
+    if shim_z != None:
         fits_fname += f"_Iz={shim_z:.1f}mA"
         
     acquire_img(mot_fname, fits_fname, t_probe=t_probe)
