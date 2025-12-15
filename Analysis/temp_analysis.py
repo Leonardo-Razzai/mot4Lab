@@ -1,7 +1,7 @@
 from Analysis.TempAnalyzer import *
 
 date = '2025-12-05'
-data_folder = 'raw_data/'+ f'{date}/img/'
+data_folder = '../raw_data/'+ f'{date}/img/'
 
 def f_base_name(t):
     return f'T_meas_test_tof={t:.1f}ms.fits.gz'
