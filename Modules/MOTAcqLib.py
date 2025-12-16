@@ -1,5 +1,5 @@
 from datetime import date
-from Refactor import refactor_file
+from .Refactor import refactor_file
 import os
 import subprocess
 from astropy.io import fits
@@ -21,7 +21,7 @@ DATA_FOLDER = os.path.join(RAW_BASE_DIR, str(Date), 'data')
 os.makedirs(IMG_FOLDER, exist_ok=True)
 os.makedirs(DATA_FOLDER, exist_ok=True)
 
-def write_mot_file(basename, params: list):
+def write_mot_file(basename, params: dict):
 
     '''Return the output file name .mot'''
 
@@ -38,8 +38,8 @@ def write_mot_file(basename, params: list):
     for line in infile:
         out_str = line
 
-        for param in params:
-            out_str = out_str.replace(param.label, f'{param.value:.1f}')
+        for label, value in params.items():
+            out_str = out_str.replace(label, f'{value:.1f}')
 
         outfile.write(out_str)
         
