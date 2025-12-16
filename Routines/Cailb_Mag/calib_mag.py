@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from Modules.MOTAcqLib import *
 from Modules.TempAnalyzer import *
 
-Iz_vals = [-1000., -500., -200., 0., 200., 500., 1000.] # in mA
+Iz_vals = [-500., -300., -200., 0., 200., 300., 500.] # in mA
 
 CAM_GAIN = 5 # dB
 CAM_EXP_TIME = 5000 # us
