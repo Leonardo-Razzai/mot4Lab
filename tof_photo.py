@@ -58,7 +58,7 @@ if __name__ == '__main__':
 	img2.select_roi(0, 300, 200, 500)
 
 	img1.fit_gaussian(plot=False)
-	img2.fit_gaussian(plot=False)
+	img2.fit_gaussian(plot=True)
 
 	T, dT = Get_temperature(img1, img2, tof_vals[0], tof_vals[-1])
 	N1, dN1 = img1.Get_Number_Of_Atoms()
