@@ -84,7 +84,6 @@ def show_img(fits_fname):
         hdul.close()
         
 def acquire_img(mot_fname, fits_fname, t_probe=None):
-    
     ccd = subprocess.Popen(f"{os.path.join(CCD_FOLDER, 'ccd')} -f {os.path.join(IMG_FOLDER, fits_fname)}".split())
     send_to_fpga(mot_fname)
     ccd.wait()

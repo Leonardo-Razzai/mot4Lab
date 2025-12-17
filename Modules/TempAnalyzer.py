@@ -50,7 +50,7 @@ class Image:
         self.image = image
         with fits.open(image) as hdul:
             self.im_orig = clean_image(hdul[0].data)
-            print(f'{self.image}: Min = {self.im_orig.min()}, Max = {self.im_orig.max()}')
+            # print(f'{self.image}: Min = {self.im_orig.min()}, Max = {self.im_orig.max()}')
             self.im = self.im_orig
             self.hdr = hdul[0].header
             self.Gain = self.hdr['GAIN'] # gain in dB
