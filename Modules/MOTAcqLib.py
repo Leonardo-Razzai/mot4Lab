@@ -13,6 +13,7 @@ MODULE_DIR = os.path.dirname(os.path.abspath(__file__))
 # 2. Define paths relative to the module location
 RAW_BASE_DIR = os.path.join(MODULE_DIR, '..', 'raw_data') 
 MOT_FOLDER = os.path.join(MODULE_DIR, '..', 'mot_files')
+CCD_FOLDER = os.path.join(MODULE_DIR, '..', 'ccd')
 
 Date = date.today()
 IMG_FOLDER = os.path.join(RAW_BASE_DIR, str(Date), 'img')
@@ -33,7 +34,7 @@ def write_mot_file(basename, params: dict):
         
     outname = basename + '.mot'
     outfile = open(os.path.join(MOT_FOLDER, outname), "w")
-    print(f'Writing routine at {outfile}\n')
+    print(f'Writing routine at {outname}\n')
         
     for line in infile:
         out_str = line
@@ -56,7 +57,7 @@ def send_to_fpga(outname):
     mot = subprocess.call(command.split())
 
 def setup_camera(gain:float, exp_time: int):
-    proc = subprocess.call(f"./ccd/ccd -g {gain} -t {exp_time} -a".split())
+    proc = subprocess.call(f"{os.path.join(CCD_FOLDER, 'ccd')} -g {gain} -t {exp_time} -a".split())
  
 def append_t_probe_fits(fits_fname, t_probe):
     with fits.open(fits_fname + '.fits.gz') as hdul:
@@ -84,20 +85,22 @@ def show_img(fits_fname):
         
 def acquire_img(mot_fname, fits_fname, t_probe=None):
     
-    ccd = subprocess.Popen(f"./ccd/ccd -f {os.path.join(IMG_FOLDER, fits_fname)}".split())
+    ccd = subprocess.Popen(f"{os.path.join(CCD_FOLDER, 'ccd')} -f {os.path.join(IMG_FOLDER, fits_fname)}".split())
     send_to_fpga(mot_fname)
     ccd.wait()
     
     if t_probe:
         append_t_probe_fits(os.path.join(IMG_FOLDER, fits_fname), t_probe)
         
-def write_and_acquire_bkg(t_probe):
+def write_and_acquire_bkg(params):
         
-    if t_probe is None:
+    if params['<TPR>'] is None:
         print("No t_probe specified for background acquisition")
         exit()
+    else:
+        t_probe = params['<TPR>']
         
-    bkg_mot_fname = write_mot_file('bkg', t_probe)
+    bkg_mot_fname = write_mot_file('bkg', params)
     bkg_fits_fname = f"bkg_exp={t_probe}us"
 
     acquire_img(bkg_mot_fname, bkg_fits_fname, t_probe=t_probe)
@@ -109,9 +112,9 @@ def write_and_acquire_mot(mot_base_name: str,
     mot_fname = write_mot_file(mot_base_name, params)
 
     t_probe = None
-    for param in params:
-        if param.label == '<TPR>':
-            t_probe = param.value
+    for label, value in params.items():
+        if label == '<TPR>':
+            t_probe = value
                    
     acquire_img(mot_fname, fits_fname, t_probe=t_probe)
         

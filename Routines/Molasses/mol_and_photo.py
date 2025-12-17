@@ -4,24 +4,24 @@ import sys
 import os
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_dir)
-sys.path.append(parent_dir)
+gp_dir = os.path.dirname(os.path.dirname(current_dir))
+sys.path.append(gp_dir)
 
+import Params
+from Params import RT_PARAMS
 from Modules.MOTAcqLib import *
 from Modules.TempAnalyzer import *
 
-CAM_GAIN = 0 # dB
-CAM_EXP_TIME = 1000 # us
-PROBE_TIME = 500 # us
-TOF=15 # ms
+TOF = 15.
+RT_PARAMS['<TOF>'] = TOF
 
 mot_base_name = 'molasses_and_tof'
 
 ACQUIRE = True
+print()
 if ACQUIRE:
     for i in range(1, 4):
-        fits_fname = F'tof=15ms_odt=1300mW_{i:02d}'
+        fits_fname = F'T_meas_tof={TOF:.0f}ms_{i:02d}'
         print(f'Acquiring {fits_fname}')
-        setup_camera(gain=CAM_GAIN, exp_time=CAM_EXP_TIME)
-        mot_fname = write_mot_file(mot_base_name, t_probe=PROBE_TIME, tof_val=TOF)
-        acquire_img(mot_fname=mot_fname, fits_fname=fits_fname, t_probe=PROBE_TIME)
+        setup_camera(gain=Params.CAM_GAIN, exp_time=Params.CAM_EXP_TIME)
+        write_and_acquire_mot(mot_base_name, fits_fname, params=RT_PARAMS)

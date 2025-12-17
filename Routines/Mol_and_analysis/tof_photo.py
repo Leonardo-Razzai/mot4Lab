@@ -1,14 +1,19 @@
 import time
-import numpy as np
 from astropy.io import fits
 import matplotlib.pyplot as plt
+import sys
+import os
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+gp_dir = os.path.dirname(os.path.dirname(current_dir))
+sys.path.append(gp_dir)
+
+import Params
+from Params import RT_PARAMS
 from Modules.MOTAcqLib import *
+from Modules.TempAnalyzer import *
 
 tof_vals = [2.0, 20.0]
-
-CAM_GAIN = 5 # dB
-CAM_EXP_TIME = 5000 # us
-PROBE_TIME = 300 # us
 
 data_folder = f'../../raw_data/{str(Date)}/img/'
 img_base_name = 'molasses'
@@ -34,15 +39,15 @@ if __name__ == '__main__':
 	
 	print('Setup Camera')
 	wait_time_to_meas = 1
-	setup_camera(gain=CAM_GAIN, exp_time=CAM_EXP_TIME)
+	setup_camera(gain=Params.CAM_GAIN, exp_time=Params.CAM_EXP_TIME)
 
 	print('Start Sequence')
 	time.sleep(0.5)
-	write_and_acquire_bkg(t_probe=PROBE_TIME)
+	write_and_acquire_bkg(params=RT_PARAMS)
 
 	for tof_val in tof_vals:
-     
-		write_and_acquire_mot(mot_base_name, f_base_name(tof_val), t_probe=PROBE_TIME, tof_val=tof_val)
+		RT_PARAMS['<TOF>'] = tof_val
+		write_and_acquire_mot(mot_base_name, f_base_name(tof_val), params=RT_PARAMS)
 
 	print('Sequence completed')
 
