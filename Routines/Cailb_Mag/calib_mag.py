@@ -13,13 +13,14 @@ PROBE_TIME = 300 # us
 
 # MOT coils
 b_mot = 0.133 # (G/mm/A)
-I_mot = 9 # A
+I_mot = 8.8 # A
 Grad_mot = b_mot * I_mot # G/mm
 
 # Compensation coils
 a_comp = 1.4 # (G/A)
 
-data_folder = f'../../raw_data/{str(Date)}/img/'
+# data_folder = f'../../raw_data/{str(Date)}/img/'
+data_folder = f'../../raw_data/2025-12-16/img/'
 img_base_name = 'Calib_Mag'
 
 def f_base_name(Bz):
@@ -75,14 +76,14 @@ def Get_MagFactor(plot=False):
  
 if __name__ == '__main__':
 	
-	setup_camera(gain=CAM_GAIN, exp_time=CAM_EXP_TIME)
+	# setup_camera(gain=CAM_GAIN, exp_time=CAM_EXP_TIME)
 
-	time.sleep(0.5)
-	for Iz_val in Iz_vals:
-		write_and_acquire_mot(mot_base_name, img_base_name, shim_z=Iz_val)
-		print(f_base_name(Iz_val))
-		# write_mot_file(mot_base_name, shim_z=Iz_val)
-		time.sleep(1)
+	# time.sleep(0.5)
+	# for Iz_val in Iz_vals:
+	# 	write_and_acquire_mot(mot_base_name, img_base_name, shim_z=Iz_val)
+	# 	print(f_base_name(Iz_val))
+	# 	# write_mot_file(mot_base_name, shim_z=Iz_val)
+	# 	time.sleep(1)
 
 	time.sleep(0.5)
 	M, dM = Get_MagFactor(plot=True)
