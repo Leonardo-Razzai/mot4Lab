@@ -1,4 +1,4 @@
-from Analysis.TempAnalyzer import *
+from Modules.TempAnalyzer import *
 import matplotlib.pyplot as plt
 
 '''
