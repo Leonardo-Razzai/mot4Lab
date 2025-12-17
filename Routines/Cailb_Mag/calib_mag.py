@@ -1,9 +1,16 @@
 import time
 import numpy as np
-from astropy.io import fits
 import matplotlib.pyplot as plt
-from Modules.MOTAcqLib import *
+
+import sys
+import os
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
 from Modules.TempAnalyzer import *
+from Modules.MOTAcqLib import *
 
 Iz_vals = [-500., -300., -200., 0., 200., 300., 500.] # in mA
 
