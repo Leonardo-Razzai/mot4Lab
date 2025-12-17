@@ -25,8 +25,8 @@ title_font = {
   'weight' : 'bold'
 }
 
-M_pix = 53 # pix/mm calibration 2 with mot (23-06-2025)
-err_rel_M = 1/M_pix
+M_pix = 45.2 # pix/mm calibration 2 with mot (16-12-2025)
+err_rel_M = 0.3/M_pix
 PIXEL_SIZE = 1/M_pix
 
 CCD_counts_per_photon = 0.58 # counts per photon calib 24-07-2025
