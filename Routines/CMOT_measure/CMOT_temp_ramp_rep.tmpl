@@ -1,0 +1,62 @@
+LOOP
+
+
+COMMENT
+
+Measurement of CMOT size
+Single detuning, single flash time
+CMOT values [8:12:16:20] A
+ENDCOMMENT
+
+INIT
+
+Trigger = Off                                                          (0)
+Trigger CCD = Off                                                      (1)
+MOT B Field = Off                                                      (14)
+shim X = 0.0 mA                                                        (23)
+shim Y = 0.0 mA                                                        (24)
+shim Z = 0.0 mA                                                        (25)
+Ref Cool Freq = 10000000.0 Hz                                          (32)
+Ref Rep Freq = 10000000.0 Hz                                           (30)
+ODT Freq = 110000000.0 Hz                                              (42)
+ODT Amp = [0]                                                          (43)
+MOT Current = 0.0 A                                                    (22)
+ENDINIT
+
+
+INNER
+
++1ms            AOM Amp = [550]                                              (41)
++1ms            MOT B Field = On                                             (14)
++1ms            MOT Current = 8.0 A                                          (22)
++5s             RAMP shimX TO -200 mA IN 200ms (20 STEPS)                    (23)
++1ms            RAMP shimY TO -350 mA IN 200ms (20 STEPS)                    (24)
++1ms            RAMP shimZ TO 50 mA IN 200ms (20 STEPS)                      (25)
++200.1ms        RAMP MOT Current TO <CMOT> A IN 100ms (10 STEPS)              (22)
++1ms            RAMP Ref Cool Freq TO 10800000 Hz IN 100ms (10 STEPS)         (32)
++1ms            RAMP Ref Rep Frq TO <REPFREQ> Hz IN 100ms (10 STEPS)          (30)
++101ms           MOT B Field = Off                                            (14)
++5ms            shimX = -13.0 mA                                             (23)
++5us            shimY = -185.0 mA                                            (24)
++5us            shimZ = -230.0 mA                                            (25)
++5ms            RAMP AOM Amp TO [480] IN 20ms (20 STEPS)                     (41)
++20.1ms         AOM Amp = [0]                                                (41)
++50us           Ref Cool Freq = 10000000.0 Hz                                (32)
++50us           Ref Rep Freq = 10000000.0 Hz                                 (30)
++<TOF>ms        Trigger CCD = On                                             (1)
++50us           AOM Amp = [550]                                              (41)
++32us           AOM Amp = [0]                                                (41)
++20ms           Trigger CCD = Off                                            (1)
++1s             Trigger CCD = On                                             (1)
++50us           AOM Amp = [550]                                              (41)
++32us           AOM Amp = [0]                                                (41)
++20ms           Trigger CCD = Off                                            (1)
++50us           shimX = 0.0 mA                                               (23)
++50us           shimY = 0.0 mA                                               (24)
++50us           shimZ = 0.0 mA                                               (25)
+ENDINNER
+
+ITERATIONS 1
+
+
+ENDLOOP

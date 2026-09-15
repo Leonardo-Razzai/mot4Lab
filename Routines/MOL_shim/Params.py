@@ -2,9 +2,9 @@ import numpy as np
 
 # Real Time Params
 RT_PARAMS = {
-    '<TOF>': 35.0, # ms
-    '<TPR>': 500.0 # us
-} # us 
+    '<SHIM>': 0.0 ##
+    
+}
 
 # Camera Params
 CAM_GAIN = 0 # dB

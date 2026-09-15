@@ -1,2 +1,12 @@
 **/__pycache__/
-mot4py
+mot4py/
+raw_data/
+mot_files/
+VimbaX_Setup-2026-1-Linux64/
+*txt
+*~
+old*
+ccd/
+ccdnew/
+ccd backup/
+Untracked Routines/

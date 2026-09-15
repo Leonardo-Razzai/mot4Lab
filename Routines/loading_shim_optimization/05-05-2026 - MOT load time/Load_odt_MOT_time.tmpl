@@ -1,0 +1,51 @@
+LOOP
+
+COMMENT
+------------------------
+MOT load time optimization for loading ODT 05-05-2026
+------------------------
+
+ENDCOMMENT
+
+INIT
+Trigger = Off                                                          (0)
+Trigger CCD = Off                                                      (1)
+MOT B Field = Off                                                      (14)
+shim X = 0.0 mA                                                        (23)
+shim Y = 0.0 mA                                                        (24)
+shim Z = 0.0 mA                                                        (25)
+ODT Freq = 110000000.0 Hz                                              (42)
+ODT Amp = [0]                                                          (43)
+MOT Current = 0.0 A                                                    (22)
+ENDINIT
+
+INNER
++1s             Ref Cool Freq = 10000000.0 Hz                                (32)
++1ms            AOM Amp = [550]                                              (41)
++1s             MOT B Field = On                                             (14)
++1ms            MOT Current = 8.0 A                                          (22)
++1ms            ODT Amp = [<ODTamp>]                                         (43)
++<tmot>ms       RAMP shim X TO -260 mA IN 200ms (20 STEPS)                   (23)
++1ms            RAMP shim Y TO -310 mA IN 200ms (20 STEPS)                   (24)
++1ms            RAMP shim Z TO -600 mA IN 200ms (20 STEPS)                   (25)
++200.1ms        MOT B Field = Off                                            (14)
++50us           shim X = -13.0 mA                                            (23)
++50us           shim Y = -185.0 mA                                           (24)
++50us           shim Z = -230.0 mA                                           (25)
++50us           RAMP Ref Cool Freq TO 10900000.0 Hz IN 5ms (20 STEPS)        (32)
++5.1ms          RAMP AOM amp TO [480] IN 5ms (20 STEPS)                      (41)
++5.1ms          AOM Amp = [0]                                                (41)
++50us           Ref Cool Freq = 10000000.0 Hz                                (32)
++29.9ms         ODT Amp = [0]                                                (43)
++0.1ms          Trigger CCD = On                                             (1)
++50us           AOM Amp = [550]                                              (41)
++500us          AOM Amp = [0]                                                (41)
++100ms          Trigger CCD = Off                                            (1)
++50us           shim X = 0.0 mA                                              (23)
++50us           shim Y = 0.0 mA                                              (24)
++50us           shim Z = 0.0 mA                                              (25)
+ENDINNER
+
+ITERATIONS 1
+
+ENDLOOP

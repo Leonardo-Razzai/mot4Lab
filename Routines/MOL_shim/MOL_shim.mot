@@ -1,0 +1,44 @@
+LOOP
+
+COMMENT
+Load ODT from MOT
+ENDCOMMENT
+
+INIT
+Trigger = Off                                                          (0)
+Trigger CCD = Off                                                      (1)
+MOT B Field = Off                                                      (14)
+
+shim X = 20.0 mA                                                       (23)
+shim Y = -800.0 mA                                                     (24)
+shim Z = -250.0 mA                                                     (25)
+
+ODT Freq = 110000000.0 Hz                                              (42)
+ODT Amp = [0]                                                          (43)
+MOT Current = 0.0 A                                                    (22)
+ENDINIT
+
+INNER
++1s             Ref Cool Freq = 10000000.0 Hz                                (32)
++1ms            AOM Amp = [600]                                              (41)
++1s             MOT B Field = On                                             (14)
++1ms            MOT Current = 8.0 A                                          (22)
++5s             MOT B Field = On                                             (14)
++201ms          MOT B Field = Off                                            (14)
++50us           Trigger = On                                                 (0)
+
++5us            shim X = 20.0 mA                                             (23) 
++5us            shim Y = -800.0 mA                                           (24) 
++5us            shim Z = -180.0 mA                                           (25) 
+
++5us           RAMP Ref Cool Freq TO 10900000.0 Hz IN 5ms (20 STEPS)         (32)
++100ms         Trigger CCD = On                                              (1)
++1us           Ref Cool Freq = 10000000.0 Hz                                 (32)
++1s            shim X = 20.0 mA                                              (23)
++5us           shim Y = -800.0 mA                                            (24)
++5us           shim Z = -250.0 mA                                            (25)
+ENDINNER
+
+ITERATIONS 20
+
+ENDLOOP

@@ -1,7 +1,8 @@
 LOOP
 
 COMMENT
-Acquire Background
+Molasses and Time Of Flight
+
 ENDCOMMENT
 
 INIT
@@ -16,15 +17,18 @@ ENDINIT
 
 INNER
 +1s             Ref Cool Freq = 10000000.0 Hz                                (32)
-+1ms            MOT B Field = Off                                            (14)
-+1ms            AOM Amp = [0]                                                (41)
-+100us          Ref Cool Freq = 10000000.0 Hz                                (32)
-+20.0ms         Trigger CCD = On                                             (1)
-+50us           AOM Amp = [700]                                              (41)
-+<TPR>us        AOM Amp = [0]                                                (41)
++1ms            AOM Amp = [550]                                              (41)
++50us           shim X = -200.0 mA                                           (23)
++50us           shim Y = <shimY> mA                                          (24)
++50us           shim Z = 50 mA                                               (25)
++1s             MOT B Field = On                                             (14)
++10s            Trigger = On                                                 (0)
++50us           AOM Amp = [0]                                                (41)
++50us           Trigger CCD = On                                             (1)
++100us          AOM Amp = [550]                                              (41)
++35us           AOM Amp = [0]                                                (41)
 +20ms           Trigger CCD = Off                                            (1)
-+1ms            AOM Amp = [700]                                              (41)
-+20ms           Ref Cool Freq = 10000000.0 Hz                                (32)
++1ms            AOM Amp = [550]                                              (41)
 +50us           MOT B Field = Off                                            (14)
 +50us           shim X = 0.0 mA                                              (23)
 +50us           shim Y = 0.0 mA                                              (24)

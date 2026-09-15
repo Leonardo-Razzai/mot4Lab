@@ -1,5 +1,8 @@
 from Modules.MOTAcqLib import show_img
+import datetime
+from sys import argv
 
-fits_name = 'raw_data/2025-12-17/img/Ix=-750mA_Iz=-100mA_01'
+f_name = argv[1] 
+fits_name = f'raw_data/{datetime.today()}/img/{f_name}'
 
 show_img(fits_name)
