@@ -22,6 +22,8 @@ DATA_FOLDER = os.path.join(RAW_BASE_DIR, str(Date), 'data')
 os.makedirs(IMG_FOLDER, exist_ok=True)
 os.makedirs(DATA_FOLDER, exist_ok=True)
 
+VERBOSE = False
+
 def write_mot_file(basename, params: dict):
 
     '''Return the output file name .mot'''
@@ -38,26 +40,52 @@ def write_mot_file(basename, params: dict):
         
     for line in infile:
         out_str = line
-
-        for label, value in params.items():
-            out_str = out_str.replace(label, f'{value:.1f}')
-
-        outfile.write(out_str)
+        if VERBOSE:
+            print(f'Reached line 41\n')
         
+        for label, value in params.items(): 
+            if type(value) is int:
+                out_str = out_str.replace(label, f'{value:d}') 
+            if type(value) is float:
+                out_str = out_str.replace(label, f'{value:.3f}')
+                   
+        outfile.write(out_str)
+        if VERBOSE:
+            print(f'Reached line 54\n')
+                
     outfile.close()
+    if VERBOSE:
+        print(f'Reached line 58\n')
     infile.close()
+    if VERBOSE:
+        print(f'Reached line 61\n')
 
     refactor_file(inname)
+    if VERBOSE:
+        print(f'Reached line 65\n')
         
     return outname
 
 def send_to_fpga(outname):
-    reset = "python3 -m mot4py -R"
-    command = f"python3 -m mot4py -f {os.path.join(MOT_FOLDER, outname)}"
-    mot = subprocess.call(command.split())
+    
+    if VERBOSE:
+        print(f'Reached line 72\n')
 
-def setup_camera(gain:float, exp_time: int):
-    proc = subprocess.call(f"{os.path.join(CCD_FOLDER, 'ccd')} -g {gain} -t {exp_time} -a".split())
+    command = f"python3 -m mot4py -f {os.path.join(MOT_FOLDER, outname)}"
+    if VERBOSE:
+        print(f'Reached line 76\n')
+
+    mot = subprocess.run(command.split())
+    if VERBOSE:
+        print(f'Reached line 80\n')
+	
+def setup_camera(gain: float, exp_time: int, n=1, manta=False):
+    ccd_command_list = [f"{os.path.join(CCD_FOLDER, 'ccdnew')}", f"-g {gain}", f"-t {exp_time}"]
+    if manta:
+        ccd_command_list.append('-m')
+    if VERBOSE:
+        print(ccd_command_list)        
+    proc = subprocess.run(ccd_command_list)
  
 def append_t_probe_fits(fits_fname, t_probe):
     with fits.open(fits_fname + '.fits.gz') as hdul:
@@ -71,7 +99,10 @@ def show_img(fits_fname):
     with fits.open(f"{fits_fname}.fits.gz") as hdul:
         img = hdul[0].data
         Gain = hdul[0].header['GAIN']
-        t_probe = hdul[0].header['T_PROBE']
+        try:
+            t_probe = hdul[0].header['T_PROBE']
+        except Exception as e:
+            t_probe = '??'
         
         fig, ax = plt.subplots(1)
         ax.imshow(img)
@@ -83,13 +114,23 @@ def show_img(fits_fname):
         plt.show()
         hdul.close()
         
-def acquire_img(mot_fname, fits_fname, t_probe=None):
-    ccd = subprocess.Popen(f"{os.path.join(CCD_FOLDER, 'ccd')} -f {os.path.join(IMG_FOLDER, fits_fname)}".split())
-    send_to_fpga(mot_fname)
-    ccd.wait()
-    
-    if t_probe:
-        append_t_probe_fits(os.path.join(IMG_FOLDER, fits_fname), t_probe)
+def acquire_img(mot_fname, fits_fname, t_probe=None, n=1, params={}, manta=False):
+
+	print(f'Start acquiring MOT image\n')
+	ccd_command_list = [f"{os.path.join(CCD_FOLDER, 'ccdnew')}", '-a', '-c', f"\"{params}\"", f"-n {n}", "-f", f"{os.path.join(IMG_FOLDER, fits_fname)}"]
+	if manta:
+		ccd_command_list.insert(1,"-m")
+		if VERBOSE:
+		   print(ccd_command_list)
+	ccd = subprocess.Popen(ccd_command_list)
+	send_to_fpga(mot_fname)
+	print(f'mot_fname sent to fpga\n')
+	ccd.wait()
+	print(f'mot_fname sent to fpga and waited\n')
+	
+	if t_probe:
+		append_t_probe_fits(os.path.join(IMG_FOLDER, fits_fname), t_probe)
+	print(f't probed\n')
         
 def write_and_acquire_bkg(params):
         
@@ -106,16 +147,24 @@ def write_and_acquire_bkg(params):
 
 def write_and_acquire_mot(mot_base_name: str,
                           fits_fname: str,
-                          params):
-        
-    mot_fname = write_mot_file(mot_base_name, params)
+                          params,
+                          n=1,
+                          manta=False):
+     
+	mot_fname = write_mot_file(mot_base_name, params)
+	
+	print(f'mot_fname written\n')
 
-    t_probe = None
-    for label, value in params.items():
-        if label == '<TPR>':
-            t_probe = value
+	t_probe = None
+	for label, value in params.items():
+		if label == '<TPR>':
+			t_probe = value
                    
-    acquire_img(mot_fname, fits_fname, t_probe=t_probe)
+	print(f'Ready to acquire MOT image\n')
+
+	acquire_img(mot_fname, fits_fname, t_probe=t_probe, n=n, params=params, manta=manta)
+	print(f'Mot image acquired\n')
+
         
 def save_data(data_filename: str, data_dict):
     df = pd.DataFrame(data_dict)
