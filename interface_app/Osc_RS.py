@@ -1,4 +1,4 @@
-from interface_app.Interface_app import *
+from Interface_app import *
 
 class Osc_RS(VISA_inst):
     """
@@ -229,6 +229,13 @@ class Osc_RS(VISA_inst):
             raise RuntimeError("Acquisition failed to complete.")
     
     def Get_Meas(self, channel=1):
+        """
+        Retrives the value measurement specified on oscilloscope for the channell chosen.
         
+        Returns
+        -------
+        tuple
+            A float containing the measurement in Volts (if vertical) or seconds (if horizontal).
+        """
         res = float(self.dev.query(f'MEAS{channel}:RESULT?'))
         return res

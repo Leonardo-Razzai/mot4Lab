@@ -24,7 +24,7 @@ Lab_Instruments = {
   },
   
   "Osc_RS":{
-    "ip_addr": "192.168.1.105",
+    "ip_addr": "192.168.1.12",
     "mac_addr": "00:90:b8:28:20:b4"
   },
   
