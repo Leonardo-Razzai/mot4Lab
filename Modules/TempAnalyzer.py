@@ -26,11 +26,16 @@ title_font = {
 }
 
 M_pix = 45.2 # pix/mm calibration 2 with mot (16-12-2025)
-err_rel_M = 0.3/M_pix
-PIXEL_SIZE = 1/M_pix
+PIXEL_SIZE = 20.9e-3 # mm/px (Manta: claibrated on 02-09-2026)
+err_rel_M = 0.2e-3/PIXEL_SIZE
 
-CCD_counts_per_photon = 0.58 # counts per photon calib 24-07-2025
-err_rel_counts_per_photon = 0.02
+# FLIR
+# CCD_counts_per_photon = 0.58 # counts per photon calib 24-07-2025
+# err_rel_counts_per_photon = 0.02
+
+# Manta
+CCD_counts_per_photon = 1/7.28 # counts per photon calib 16-06-2026
+err_rel_counts_per_photon = 0.05
 
 M_Rb87 = 86.909 * 1.660539e-27 # Rb87 mass in kg
 KB = 1.38064852e-23 # Boltzmann constant in J/K
@@ -149,12 +154,13 @@ class Image:
                 if Res_N != None:
                     Na, dNa = Res_N
 
-            label = '\nResults from 1 Gaussian Fit: ' + f'\nA = {popt[0]:.0f}\n' + 'mu ='+f'{popt[1]:.0f}\n' 'sigma ='+f'{popt[2]:.0f}'
-            print(label)
+            label = f'\nResults from 1 Gaussian Fit, axis = {axis}: ' + f'\nA = {popt[0]:.0f}\n' + 'mu ='+f'{popt[1]:.0f}\n' 'sigma ='+f'{popt[2]:.0f}'
+            
             if Na != None:
-                num_label = f'N = ({Na /1e8:.1f} +- {dNa /1e8:.1f}) x 10^8'
-                print(num_label+'\n')
+                num_label = f'\nN = ({Na /1e8:.1f} +- {dNa /1e8:.1f}) x 10^8'
+                label += num_label
 
+            print(label)
             if plot:
                 plt.plot(xdata, ydata)
                 label = 'Gaussian Fit: ' + f'\nA = {popt[0]:.0f}\n' + r'$\mu$ ='+f'{popt[1]:.0f}\n' r'$\sigma$ ='+f'{popt[2]:.0f}\n'
@@ -273,7 +279,7 @@ def Get_temperature(im1: Image, im2: Image, t1: float, t2: float, axis='x'):
 
 def Sat_param():
     
-    P_MOT = 78 # mW, MOT beams power
+    P_MOT = 48 # mW, MOT beams power (measured on 15-09-2026)
     
     NA = 0.16
     f = 7.5 # cm
