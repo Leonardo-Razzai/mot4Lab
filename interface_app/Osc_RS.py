@@ -1,4 +1,4 @@
-from Interface_app import *
+from interface_app.Interface_app import *
 
 class Osc_RS(VISA_inst):
     """

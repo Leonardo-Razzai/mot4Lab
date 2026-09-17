@@ -108,6 +108,7 @@ class VISA_inst():
             rm (pyvisa.ResourceManager): The resource manager object from PyVISA.
             instr_name (str): The name of the instrument to connect to.
         """
+        print(f'\nConnecting to device: {LAN_addr(Lab_Instruments[instr_name]["ip_addr"])}\n')
         self.dev = rm.open_resource(LAN_addr(Lab_Instruments[instr_name]["ip_addr"]))
         self.dev.read_termination = '\n'
         self.dev.write_termination = '\n'
