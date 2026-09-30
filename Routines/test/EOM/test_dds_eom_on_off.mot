@@ -1,0 +1,29 @@
+LOOP
+
+COMMENT
+Date: 2026-09-23
+Title: Test on/off DDS with DIGITAL channel 3 as trigger
+Notes:
+- EOM freq has code 48
+- EOM amp has code 49
+- 20 us pulse at 10 MHz
+
+ENDCOMMENT
+
+INIT
+Trigger EOM = Off                                                      (3)
+EOM Amp = [0]                                                          (49)
+EOM Freq = 10.0 MHz                                                    (48)
+ENDINIT
+
+INNER
++2s             EOM Amp = [0]                                                (49)
++1ms            Trigger = On                                                 (3)
++1us            EOM Amp = [20]                                               (49)
++20us           EOM Amp = [0]                                                (49)
++1ms            Trigger = Off                                                (3)
+ENDINNER
+
+ITERATIONS 5
+
+ENDLOOP

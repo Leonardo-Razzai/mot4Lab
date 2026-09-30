@@ -1,0 +1,33 @@
+LOOP
+
+COMMENT
+Date: 2026-09-23
+Title: Test FM with DDS4 with DIGITAL channel 3 as trigger
+Notes:
+- EOM freq has code 48
+- EOM amp has code 49
+- ramp frequency from 10002 MHz to 10004 MHz in 40 ms
+
+To setup SA Rigol:
+- Span -> Full Span
+- Press peak
+- Freq -> CF peak
+- Span -> Zero Span
+- Sweep/Trig -> Time: 40 ms
+ENDCOMMENT
+
+INIT
+Trigger EOM = Off                                                      (3)
+EOM Amp = [20]                                                         (49)
+EOM Freq = 10002 kHz                                                 (48)
+ENDINIT
+
+INNER
++1s             Trigger = On                                                 (3)
++50us           RAMP EOM Freq TO 10004 kHz IN 40ms (200 STEPS)              (48)
++20.1ms         Trigger = Off                                                (3)
+ENDINNER
+
+ITERATIONS 10
+
+ENDLOOP

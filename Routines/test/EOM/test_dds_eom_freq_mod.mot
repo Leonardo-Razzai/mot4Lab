@@ -1,0 +1,34 @@
+LOOP
+
+COMMENT
+Date: 2026-09-23
+Title: Test FM with DDS4 with DIGITAL channel 3 as trigger
+Notes:
+- EOM freq has code 48
+- EOM amp has code 49
+- hop frequency at from 9.9 MHz to 10 MHz
+
+Rising time BCO measurement setup with SA:
+- set centerfrequency on SA to 6830 MHz
+- AMPT -> set amplitude scale to linear and autoscale
+- SPAN -> set zero Span
+- SWeep/Trig -> set Trigger Type to External, Mode to Cont
+- SWeep/Trig -> set Time to 4 ms
+ENDCOMMENT
+
+INIT
+Trigger EOM = Off                                                      (3)
+EOM Amp = [20]                                                         (49)
+EOM Freq = 9.9 MHz                                                   (48)
+ENDINIT
+
+INNER
++1ms            EOM Freq = 9.9 MHz                                         (48)
++1s             Trigger = On                                                 (3)
++500us           EOM Freq = 10.0 MHz                                       (48)
++1s            Trigger = Off                                                (3)
+ENDINNER
+
+ITERATIONS 10
+
+ENDLOOP
