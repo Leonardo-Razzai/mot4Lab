@@ -169,8 +169,14 @@ def write_and_acquire_mot(mot_base_name: str,
 def save_data(data_filename: str, data_dict):
     df = pd.DataFrame(data_dict)
     out_name = os.path.join(DATA_FOLDER, data_filename)
-    print(f'Saving data at {out_name}\n')
-    df.to_csv(out_name)
+
+    if not os.path.exists(out_name):     
+        print(f'Saving data at {out_name}\n')
+        df.to_csv(out_name)
+    else:
+        df_old = pd.read_csv(out_name)
+        df_new = pd.concat([df_old, df], join='inner', ignore_index=True)
+        df_new.to_csv(out_name)
 
 if __name__ == '__main__':
     print(RAW_BASE_DIR)

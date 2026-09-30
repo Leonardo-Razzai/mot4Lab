@@ -2,13 +2,13 @@ import time
 import os
 import sys
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
-grandparent_dir = os.path.dirname(os.path.dirname(current_dir))
-grand_grandparent_dir  = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
-grand_grand_grandparent_dir  = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(current_dir))))
-sys.path.append(grandparent_dir)
-sys.path.append(grand_grandparent_dir)
-sys.path.append(grand_grand_grandparent_dir)
+from pathlib import Path
+
+current_dir = Path(__file__).resolve() 
+sys.path.append(str(current_dir.parents[1]))
+sys.path.append(str(current_dir.parents[2]))
+sys.path.append(str(current_dir.parents[3]))
+sys.path.append(str(current_dir.parents[4]))
 
 from Modules.MOTAcqLib import *
 from Modules.TempAnalyzer import *
@@ -86,9 +86,9 @@ def analysis(show_im=False):
 	print('-'*35 + '\n')
 
 ACQ = True
-ANALYS = True
+ANALYSIS = True
 if __name__ == '__main__':
 	if ACQ:
 		acquisition()
-	if ANALYS:
+	if ANALYSIS:
 		analysis()
