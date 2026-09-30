@@ -16,7 +16,7 @@ from Modules.TempAnalyzer import *
 
 MOT_BASE_NAME = 'load_odt_standing_wave'
 FITS_BASE_NAME = MOT_BASE_NAME + 't_odt'
-REPETITIONS = 5
+REPETITIONS = 20
 
 # param values are set in the for loop
 RT_PARAMS= {
@@ -36,7 +36,7 @@ ODTBlackamp = 880
 print("\n"+ "-"*30)
 
 # time of flight with odt off, before photo
-t_odt_values = range(30, 40, 3)
+t_odt_values = range(30, 46, 15)
 
 for t_odt in t_odt_values:
 	t_odt=t_odt-0.1
