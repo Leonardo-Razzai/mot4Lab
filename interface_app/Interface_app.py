@@ -19,7 +19,7 @@ IP: 192.168.1.114, MAC: 00:90:b8:28:20:b4 -> oscilloscope
 
 Lab_Instruments = {
   "SA_Rigol":{
-    "ip_addr": "192.168.1.11",
+    "ip_addr": "192.168.1.158",
     "mac_addr": "00:19:af:52:91:bf"
   },
   

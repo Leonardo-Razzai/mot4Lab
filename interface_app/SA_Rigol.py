@@ -57,6 +57,11 @@ class SA_Rigol(VISA_inst):
         """
         self.dev.write(f':FREQ:CENT {freq}')
 
+    def Set_Center_Frequency_Peak(self):
+        self.dev.write(f':CALC:MARK1:MAX:MAX')
+        time.sleep(1)
+        self.dev.write(f':CALC:MARK1:PEAK:CF')
+
     def Set_TraceType(self, trace=1, trace_type='WRIT'):
         """
         Configures the type of trace operation.
@@ -67,6 +72,16 @@ class SA_Rigol(VISA_inst):
                               'VIEW', 'BLANk', 'VIDeoavg', 'POWeravg'.
         """
         self.dev.write(f':TRACe<{trace}:MODE {trace_type}')
+
+    def Set_Trigger(self, type: str):
+        self.dev.write(f':TRIG:SEQ:SOUR {type}')
+    
+    def Set_SWT(self, time):
+        self.dev.write(f':SWEEP:TIME {time}')
+
+    def Set_RBW(self, rbw: int):
+        self.dev.write(f':SENS:BAND:RES {rbw}')
+
 
     def Get_Peak(self, span_about_cent=1e8):
         """
@@ -87,7 +102,7 @@ class SA_Rigol(VISA_inst):
         height = self.dev.query(':CALC:MARK1:Y?')  # Get Y coordinate (amplitude)
         return freq, height
     
-    def Get_Trace(self, file_name: str, trace=1):
+    def Get_Trace_Freq(self, file_name: str, trace=1):
         ans = self.dev.query(f":TRACE{trace}:MODE?")
         if ans.startswith("BLAN"):
             print("Empty trace!")
@@ -120,6 +135,29 @@ class SA_Rigol(VISA_inst):
             
             for i in range(pts):
                 file.write("%e, %e\n" % (x[i], y[i]))
+
+    def Get_Trace_Time(self, trace=1):
+        ans = self.dev.query(f":TRACE{trace}:MODE?")
+        if ans.startswith("BLAN"):
+            print("Empty trace!")
+            exit()
+        else:
+            units = self.dev.query(":UNIT:POW?").rstrip()
+            swt = float(self.dev.query(":SENS:SWE:TIME?").rstrip())
+            
+            # Y
+            self.dev.write(":FORM:TRAC:DATA REAL,32")
+            self.dev.write(":FORM:BORD NORM")
+            y = self.dev.query_binary_values(f":TRAC:DATA? TRACE{trace}")
+            t = np.linspace(0, swt, len(y))
+        
+        data = {
+            't (s)': t,
+            f'y ({units})': np.array(y)
+        }
+
+        return data
+
     
     def Save_Result(self, file_name: str):
         self.dev.write(f':MMEMory:STORe:RESults E:\{file_name}')
